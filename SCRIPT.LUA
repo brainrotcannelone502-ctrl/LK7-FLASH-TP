@@ -3,7 +3,7 @@ local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 local backpack = player:WaitForChild("Backpack")
-local targetPosition = Vector3.new(-336.7, -7.2, 86.8) -- coordenada segura
+local targetPosition = Vector3.new(-336.7, -7.2, 86.8) -- coordenada da home base
 local flashTPEnabled = false
 
 local function getCharacter()

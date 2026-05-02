@@ -1,34 +1,32 @@
 local player = game.Players.LocalPlayer
 local sg = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
-sg.Name = "KanyeHub_V32_Forced"
+sg.Name = "KanyeHub_V33_UltraSafe"
 sg.ResetOnSpawn = false
 
 local FlashAtivado = false
 
--- JANELA PRINCIPAL (DESIGN KANYEHUB - image_97ad99.png)
-local Main = Instance.new("Frame", sg)
+-- JANELA PRINCIPAL (ESTILO image_97ad99.png)
+local Main = Instance.new("Frame")
+Main.Name = "MainFrame"
+Main.Parent = sg
 Main.Size = UDim2.new(0, 280, 0, 330)
 Main.Position = UDim2.new(0.5, -140, 0.4, 0)
-Main.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-Main.BackgroundTransparency = 0.1 -- Transparência para evitar que fique tudo preto
+Main.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 Main.BorderSizePixel = 0
 Main.Active = true
 Main.Draggable = true
 Main.ZIndex = 1
-
-local Corner = Instance.new("UICorner", Main)
-Corner.CornerRadius = UDim.new(0, 15)
+Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 15)
 
 -- TÍTULO
 local Title = Instance.new("TextLabel", Main)
 Title.Text = "KANYEHUB FLASH TP"
-Title.Size = UDim2.new(1, -20, 0, 50)
-Title.Position = UDim2.new(0, 15, 0, 0)
+Title.Size = UDim2.new(1, 0, 0, 50)
 Title.TextColor3 = Color3.new(1, 1, 1)
-Title.Font = Enum.Font.LuckiestGuy 
-Title.TextSize = 20
+Title.Font = Enum.Font.SourceSansBold
+Title.TextSize = 22
 Title.BackgroundTransparency = 1
-Title.ZIndex = 2
+Title.ZIndex = 5
 
 -- LÓGICA DE BUSCA DO ITEM (RECUPERADA)
 local function UsarFlashTP()
@@ -60,35 +58,40 @@ player.CharacterChildAdded:Connect(function(child)
     end
 end)
 
--- FUNÇÃO DE CRIAR BOTÕES (FORÇADA)
+-- FUNÇÃO DE CRIAR BOTÕES (MÉTODO DE INJEÇÃO DIRETA)
 local function CreateKanyeButton(name, yPos, callback)
-    task.wait(0.1) -- Atraso para garantir que o Frame principal já exista
-    local btn = Instance.new("TextButton", Main)
-    btn.Name = "Btn_" .. name
+    -- Criamos fora e depois jogamos dentro para forçar a aparição
+    local btn = Instance.new("TextButton")
+    btn.Parent = Main
     btn.Size = UDim2.new(0.9, 0, 0, 50)
     btn.Position = UDim2.new(0.05, 0, 0, yPos)
-    btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    btn.BackgroundColor3 = Color3.fromRGB(55, 55, 55)
     btn.Text = name .. ": OFF"
     btn.TextColor3 = Color3.new(1, 1, 1)
-    btn.Font = Enum.Font.LuckiestGuy
+    btn.Font = Enum.Font.SourceSansBold
     btn.TextSize = 18
-    btn.ZIndex = 10 -- FORÇA PARA A FRENTE DE TUDO
-    
+    btn.ZIndex = 10
+    btn.AutoButtonColor = true
     Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 12)
     
     local state = false
     btn.MouseButton1Click:Connect(function()
         state = not state
         btn.Text = name .. (state and ": ON" or ": OFF")
-        btn.BackgroundColor3 = state and Color3.fromRGB(80, 80, 80) or Color3.fromRGB(50, 50, 50)
+        btn.BackgroundColor3 = state and Color3.fromRGB(100, 100, 100) or Color3.fromRGB(55, 55, 55)
         callback(state)
     end)
 end
 
--- ADICIONANDO OS BOTÕES UM POR UM
-CreateKanyeButton("FLASH TP", 60, function(v) FlashAtivado = v end)
-CreateKanyeButton("GIANT POTION", 120, function(v) end)
-CreateKanyeButton("ALIGN", 180, function(v) end)
+-- GERANDO ELEMENTOS COM INTERVALO (PARA NÃO TRAVAR A RENDERIZAÇÃO)
+task.spawn(function()
+    task.wait(0.2)
+    CreateKanyeButton("FLASH TP", 60, function(v) FlashAtivado = v end)
+    task.wait(0.1)
+    CreateKanyeButton("GIANT POTION", 120, function(v) end)
+    task.wait(0.1)
+    CreateKanyeButton("ALIGN", 180, function(v) end)
+end)
 
 -- DISCORD (RODAPÉ)
 local Discord = Instance.new("TextLabel", Main)
@@ -96,11 +99,11 @@ Discord.Text = "DISCORD.GG/KANYEHUB"
 Discord.Size = UDim2.new(1, 0, 0, 40)
 Discord.Position = UDim2.new(0, 0, 1, -40)
 Discord.TextColor3 = Color3.new(1, 1, 1)
-Discord.Font = Enum.Font.LuckiestGuy
+Discord.Font = Enum.Font.SourceSans
 Discord.BackgroundTransparency = 1
 Discord.ZIndex = 5
 
--- TECLA P PARA TOGGLE
+-- TECLA P PARA SUMIR
 game:GetService("UserInputService").InputBegan:Connect(function(i, g)
     if not g and i.KeyCode == Enum.KeyCode.P then Main.Visible = not Main.Visible end
 end)

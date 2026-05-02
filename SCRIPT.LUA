@@ -117,7 +117,7 @@ teleportButton.MouseButton1Click:Connect(function()
     local character = getCharacter()
     local equippedTool = getEquippedTool(character)
 
-    if equippedTool and equippedTool.Name:lower() == "brainrot" then
+    if equippedTool and equippedTool.Name == "flash tp" then
         if not flashTPEnabled then
             enableFlashTP(statusLabel)
             activateButton.Text = "Desativar Flash TP"

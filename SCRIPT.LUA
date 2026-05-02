@@ -3,7 +3,7 @@ local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 local backpack = player:WaitForChild("Backpack")
-local targetPosition = Vector3.new(0, 50, 0) -- coordenada segura
+local targetPosition = Vector3.new(-336.7, -7.2, 86.8) -- coordenada segura
 local flashTPEnabled = false
 
 local function getCharacter()
@@ -14,6 +14,9 @@ local function teleportCharacter()
     local character = getCharacter()
     local hrp = character:WaitForChild("HumanoidRootPart")
     hrp.CFrame = CFrame.new(targetPosition)
+    hrp.Anchored = true
+    task.wait(0.2)
+    hrp.Anchored = false
 end
 
 local function updateStatusLabel(label)
@@ -34,22 +37,13 @@ local function disableFlashTP(statusLabel)
     updateStatusLabel(statusLabel)
 end
 
-local function onBackpackItemAdded(item, statusLabel)
-    if not flashTPEnabled then
-        return
-    end
-
-    if item:IsA("Tool") and item.Name:lower() == "flash teleporte" then
-        local character = getCharacter()
-        item.Parent = character
-
-        local humanoid = character:FindFirstChildOfClass("Humanoid")
-        if humanoid then
-            humanoid:EquipTool(item)
+local function getEquippedTool(character)
+    for _, child in ipairs(character:GetChildren()) do
+        if child:IsA("Tool") then
+            return child
         end
-
-        teleportCharacter()
     end
+    return nil
 end
 
 local screenGui = Instance.new("ScreenGui")
@@ -120,21 +114,20 @@ activateButton.MouseButton1Click:Connect(function()
 end)
 
 teleportButton.MouseButton1Click:Connect(function()
-    if flashTPEnabled then
-        teleportCharacter()
-    else
-        enableFlashTP(statusLabel)
-        activateButton.Text = "Desativar Flash TP"
+    local character = getCharacter()
+    local equippedTool = getEquippedTool(character)
+
+    if equippedTool and equippedTool.Name:lower() == "brainrot" then
+        if not flashTPEnabled then
+            enableFlashTP(statusLabel)
+            activateButton.Text = "Desativar Flash TP"
+        end
         teleportCharacter()
     end
 end)
 
 closeButton.MouseButton1Click:Connect(function()
     screenGui.Enabled = false
-end)
-
-backpack.ChildAdded:Connect(function(item)
-    onBackpackItemAdded(item, statusLabel)
 end)
 
 updateStatusLabel(statusLabel)

@@ -117,12 +117,21 @@ teleportButton.MouseButton1Click:Connect(function()
     local character = getCharacter()
     local equippedTool = getEquippedTool(character)
 
+    print("Character:", character)
+    print("Equipped Tool:", equippedTool)
+    if equippedTool then
+        print("Tool Name:", equippedTool.Name)
+    end
+
     if equippedTool and equippedTool.Name == "flash tp" then
+        print("Condition met, teleporting...")
         if not flashTPEnabled then
             enableFlashTP(statusLabel)
             activateButton.Text = "Desativar Flash TP"
         end
         teleportCharacter()
+    else
+        print("Condition not met: Tool not equipped or name not 'flash tp'")
     end
 end)
 

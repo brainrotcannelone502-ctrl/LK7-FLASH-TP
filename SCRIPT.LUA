@@ -5,8 +5,9 @@ local playerGui = player:WaitForChild("PlayerGui")
 local backpack = player:WaitForChild("Backpack")
 -- Marcador de Destino (Home Base): Coordenada fixa da base para teletransporte
 local targetPosition = Vector3.new(-336.7, -7.2, 86.8) -- coordenada da home base
-local flashTPEnabled = false
-local xRayEnabled = false
+local flashTPEnabled = true
+local xRayEnabled = true
+local alignEnabled = false
 local tpDistance = 10 -- exemplo, talvez não usado no teleporte fixo
 
 local function getCharacter()
@@ -18,6 +19,17 @@ local function teleportCharacter()
     -- Usa os números exatos do Developer Console para teletransportar exatamente para a base
     local character = getCharacter()
     local hrp = character:WaitForChild("HumanoidRootPart")
+    
+    if alignEnabled then
+        -- Align with camera direction on horizontal axis and reset velocities
+        local camera = workspace.CurrentCamera
+        local lookVector = camera.CFrame.LookVector
+        lookVector = Vector3.new(lookVector.X, 0, lookVector.Z).Unit
+        hrp.CFrame = CFrame.new(hrp.Position, hrp.Position + lookVector)
+        hrp.AssemblyLinearVelocity = Vector3.zero
+        hrp.AssemblyAngularVelocity = Vector3.zero
+    end
+    
     hrp.CFrame = CFrame.new(targetPosition)
     
     -- 4. Evitar que o Boneco "Caia" do Mapa
@@ -51,7 +63,7 @@ screenGui.Parent = playerGui
 
 local frame = Instance.new("Frame")
 frame.Name = "MainFrame"
-frame.Size = UDim2.new(0, 300, 0, 350)
+frame.Size = UDim2.new(0, 300, 0, 380)
 frame.Position = UDim2.new(0.5, -150, 0.3, 0)
 frame.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
 frame.BorderSizePixel = 0
@@ -149,10 +161,26 @@ local uiCornerPlus = Instance.new("UICorner")
 uiCornerPlus.CornerRadius = UDim.new(0, 8)
 uiCornerPlus.Parent = plusButton
 
+local alignButton = Instance.new("TextButton")
+alignButton.Name = "AlignButton"
+alignButton.Size = UDim2.new(0.8, 0, 0, 40)
+alignButton.Position = UDim2.new(0.1, 0, 0, 230)
+alignButton.BackgroundColor3 = Color3.fromRGB(100, 0, 150)
+alignButton.BorderSizePixel = 0
+alignButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+alignButton.Font = Enum.Font.GothamBold
+alignButton.TextScaled = true
+alignButton.Text = "ALIGN: OFF"
+alignButton.Parent = frame
+
+local uiCornerAlign = Instance.new("UICorner")
+uiCornerAlign.CornerRadius = UDim.new(0, 8)
+uiCornerAlign.Parent = alignButton
+
 local teleportButton = Instance.new("TextButton")
 teleportButton.Name = "TeleportButton"
 teleportButton.Size = UDim2.new(0.8, 0, 0, 50)
-teleportButton.Position = UDim2.new(0.1, 0, 0, 230)
+teleportButton.Position = UDim2.new(0.1, 0, 0, 280)
 teleportButton.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
 teleportButton.BorderSizePixel = 0
 teleportButton.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -166,13 +194,13 @@ uiCornerTeleport.CornerRadius = UDim.new(0, 10)
 uiCornerTeleport.Parent = teleportButton
 
 toggleFlashTP.MouseButton1Click:Connect(function()
-    flashTPEnabled = not flashTPEnabled
-    toggleFlashTP.Text = "Ativar Flash TP: " .. (flashTPEnabled and "ON" or "OFF")
+    flashTPEnabled = true
+    toggleFlashTP.Text = "Ativar Flash TP: ON"
 end)
 
 toggleXRay.MouseButton1Click:Connect(function()
-    xRayEnabled = not xRayEnabled
-    toggleXRay.Text = "X-Ray: " .. (xRayEnabled and "ON" or "OFF")
+    xRayEnabled = true
+    toggleXRay.Text = "X-Ray: ON"
     toggleXRay()
 end)
 
@@ -184,6 +212,11 @@ end)
 plusButton.MouseButton1Click:Connect(function()
     tpDistance = math.min(100, tpDistance + 1)
     sliderLabel.Text = "Distância TP: " .. tpDistance
+end)
+
+alignButton.MouseButton1Click:Connect(function()
+    alignEnabled = not alignEnabled
+    alignButton.Text = "ALIGN: " .. (alignEnabled and "ON" or "OFF")
 end)
 
 teleportButton.MouseButton1Click:Connect(function()

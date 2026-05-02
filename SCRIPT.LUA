@@ -1,107 +1,105 @@
 local player = game.Players.LocalPlayer
 local sg = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
-sg.Name = "KanyeHub_V33_UltraSafe"
+sg.Name = "FlashTP_Recovered_V34"
 sg.ResetOnSpawn = false
 
 local FlashAtivado = false
 
--- JANELA PRINCIPAL (ESTILO image_97ad99.png)
-local Main = Instance.new("Frame")
-Main.Name = "MainFrame"
-Main.Parent = sg
-Main.Size = UDim2.new(0, 280, 0, 330)
-Main.Position = UDim2.new(0.5, -140, 0.4, 0)
-Main.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-Main.BorderSizePixel = 0
+-- JANELA PRINCIPAL (DESIGN SÓLIDO PARA EVITAR TELA PRETA)
+local Main = Instance.new("Frame", sg)
+Main.Size = UDim2.new(0, 250, 0, 200)
+Main.Position = UDim2.new(0.5, -125, 0.4, 0)
+Main.BackgroundColor3 = Color3.fromRGB(35, 35, 40) -- Cinza Escuro
+Main.BorderSizePixel = 2
+Main.BorderColor3 = Color3.fromRGB(255, 0, 0) -- Borda Vermelha
 Main.Active = true
 Main.Draggable = true
-Main.ZIndex = 1
-Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 15)
 
--- TÍTULO
 local Title = Instance.new("TextLabel", Main)
-Title.Text = "KANYEHUB FLASH TP"
-Title.Size = UDim2.new(1, 0, 0, 50)
+Title.Text = "AUTO FLASH TP - ESTÁVEL"
+Title.Size = UDim2.new(1, 0, 0, 35)
 Title.TextColor3 = Color3.new(1, 1, 1)
-Title.Font = Enum.Font.SourceSansBold
-Title.TextSize = 22
-Title.BackgroundTransparency = 1
-Title.ZIndex = 5
+Title.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 14
 
--- LÓGICA DE BUSCA DO ITEM (RECUPERADA)
-local function UsarFlashTP()
+local UIList = Instance.new("UIListLayout", Main)
+UIList.Padding = UDim.new(0, 10)
+UIList.HorizontalAlignment = Enum.HorizontalAlignment.Center
+
+-- ESPAÇADOR PARA O TÍTULO
+local Pad = Instance.new("Frame", Main)
+Pad.Size = UDim2.new(1, 0, 0, 40)
+Pad.BackgroundTransparency = 1
+
+-- LÓGICA DE BUSCA E ACIONAMENTO (DA NOSSA CONVERSA ANTERIOR)
+local function AcionarFlashTP()
     local char = player.Character
-    local hum = char and char:FindFirstChildOfClass("Humanoid")
+    local hum = char:FindFirstChildOfClass("Humanoid")
+    local hrp = char:FindFirstChild("HumanoidRootPart")
+    
+    -- BUSCA O ITEM PELO NOME NO INVENTÁRIO (BACKPACK) OU NA MÃO (CHAR)
     local tool = player.Backpack:FindFirstChild("flash teleport") or char:FindFirstChild("flash teleport")
     
+    -- SE NÃO ACHAR PELO NOME EXATO, TENTA ACHAR POR QUALQUER UM COM "FLASH"
     if not tool then
-        for _, v in pairs(player.Backpack:GetChildren()) do
-            if v.Name:lower():find("flash") then tool = v break end
+        for _, item in pairs(player.Backpack:GetChildren()) do
+            if item.Name:lower():find("flash") then
+                tool = item
+                break
+            end
         end
     end
 
-    if tool and hum then
-        hum:UnequipTools()
+    if tool and hum and hrp then
+        hum:UnequipTools() -- LIMPA A MÃO (SOLTA O BRAINROT)
         task.wait(0.05)
-        tool.Parent = char
+        tool.Parent = char -- EQUIPA O FLASH
         task.wait(0.05)
-        tool:Activate()
-        local hrp = char:FindFirstChild("HumanoidRootPart")
-        if hrp then hrp.CFrame = hrp.CFrame + (hrp.CFrame.LookVector * 15) end
+        tool:Activate() -- ACIONA O TELEPORTE
+        
+        -- IMPULSO DE FUGA
+        hrp.CFrame = hrp.CFrame + (hrp.CFrame.LookVector * 15)
     end
 end
 
+-- DETECTA QUANDO VOCÊ PEGA O ITEM DE ROUBO
 player.CharacterChildAdded:Connect(function(child)
     if FlashAtivado and child:IsA("Tool") and not child.Name:lower():find("flash") then
         task.wait(0.05)
-        UsarFlashTP()
+        AcionarFlashTP()
     end
 end)
 
--- FUNÇÃO DE CRIAR BOTÕES (MÉTODO DE INJEÇÃO DIRETA)
-local function CreateKanyeButton(name, yPos, callback)
-    -- Criamos fora e depois jogamos dentro para forçar a aparição
-    local btn = Instance.new("TextButton")
-    btn.Parent = Main
-    btn.Size = UDim2.new(0.9, 0, 0, 50)
-    btn.Position = UDim2.new(0.05, 0, 0, yPos)
-    btn.BackgroundColor3 = Color3.fromRGB(55, 55, 55)
+-- FUNÇÃO DE CRIAR BOTÃO (DESIGN PADRÃO ROBUSTO)
+local function CreateButton(name, callback)
+    local btn = Instance.new("TextButton", Main)
+    btn.Size = UDim2.new(0.9, 0, 0, 45)
+    btn.BackgroundColor3 = Color3.fromRGB(60, 60, 65)
     btn.Text = name .. ": OFF"
     btn.TextColor3 = Color3.new(1, 1, 1)
-    btn.Font = Enum.Font.SourceSansBold
-    btn.TextSize = 18
-    btn.ZIndex = 10
-    btn.AutoButtonColor = true
-    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 12)
+    btn.Font = Enum.Font.GothamBold
+    btn.TextSize = 13
     
     local state = false
     btn.MouseButton1Click:Connect(function()
         state = not state
         btn.Text = name .. (state and ": ON" or ": OFF")
-        btn.BackgroundColor3 = state and Color3.fromRGB(100, 100, 100) or Color3.fromRGB(55, 55, 55)
+        btn.BackgroundColor3 = state and Color3.fromRGB(0, 150, 0) or Color3.fromRGB(60, 60, 65)
         callback(state)
     end)
 end
 
--- GERANDO ELEMENTOS COM INTERVALO (PARA NÃO TRAVAR A RENDERIZAÇÃO)
-task.spawn(function()
-    task.wait(0.2)
-    CreateKanyeButton("FLASH TP", 60, function(v) FlashAtivado = v end)
-    task.wait(0.1)
-    CreateKanyeButton("GIANT POTION", 120, function(v) end)
-    task.wait(0.1)
-    CreateKanyeButton("ALIGN", 180, function(v) end)
-end)
+-- BOTÕES DE FUNCIONAMENTO
+CreateButton("FLASH TP AUTO", function(v) FlashAtivado = v end)
 
--- DISCORD (RODAPÉ)
-local Discord = Instance.new("TextLabel", Main)
-Discord.Text = "DISCORD.GG/KANYEHUB"
-Discord.Size = UDim2.new(1, 0, 0, 40)
-Discord.Position = UDim2.new(0, 0, 1, -40)
-Discord.TextColor3 = Color3.new(1, 1, 1)
-Discord.Font = Enum.Font.SourceSans
-Discord.BackgroundTransparency = 1
-Discord.ZIndex = 5
+local Manual = Instance.new("TextButton", Main)
+Manual.Size = UDim2.new(0.9, 0, 0, 45)
+Manual.Text = "USAR FLASH MANUAL"
+Manual.BackgroundColor3 = Color3.fromRGB(80, 80, 85)
+Manual.TextColor3 = Color3.new(1, 1, 1)
+Manual.Font = Enum.Font.GothamBold
+Manual.MouseButton1Click:Connect(AcionarFlashTP)
 
 -- TECLA P PARA SUMIR
 game:GetService("UserInputService").InputBegan:Connect(function(i, g)
